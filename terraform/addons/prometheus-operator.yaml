@@ -1,0 +1,51 @@
+---
+# define custom rule
+additionalPrometheusRulesMap:
+  custom-rule:
+    groups:
+      - name: general.rules
+        rules:
+          - alert: ContainerMemoryUsage
+            expr: (sum(container_memory_usage_bytes) BY (pod, namespace) / sum(container_memory_max_usage_bytes) BY (pod, namespace) * 100) > 10
+            for: 60s
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage for :: {{ $labels.pod }}"
+              description: "Pod memory usage is above 10%\n  Pod: {{ $labels.pod }}\n  Namespace: {{ $labels.namespace }}\n  Usage = {{ $value }}\n"
+# configure alertmanager
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'null'
+      routes:
+        - match:
+            alertname: Watchdog
+          receiver: 'null'
+        - match:
+            alertname: ContainerMemoryUsage
+          receiver: 'challenge_events'
+    receivers:
+      - name: 'null'
+      - name: 'challenge_events'
+        webhook_configs:
+          - url: 'https://hazelcast-cloud-challenge.herokuapp.com/challenge_events'
+            send_resolved: true
+grafana:
+  # test only - not needed
+  enabled: False
+kubeEtcd:
+  # not needed in EKS
+  enabled: False
+kubeControllerManager:
+  # not needed in EKS
+  enabled: False
+kubeScheduler:
+  # not needed in EKS
+  enabled: False
