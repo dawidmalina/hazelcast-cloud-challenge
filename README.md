@@ -70,6 +70,48 @@ terraform plan
 
 > This process might take several minutes before it will be fully completed
 
+At the end you should see output similar to this:
+```
+Outputs:
+
+info =
+
+- Custer Name           :: hazelcast-challenge
+- ID                    :: vpc-07b953974a8e1568a
+- Region                :: eu-central-1
+- Availability Zones    :: eu-central-1a, eu-central-1b, eu-central-1c
+
+Subnets:
+- Public                :: subnet-0f697da3cb1ec82a6, subnet-07aa87bd43b9dd419, subnet-04b3af46f6f082f65
+- Private               :: subnet-0c465e6c552d1b63f, subnet-050b202a45dc9e5ea, subnet-0000a032c0f0f9389
+
+Monitoring:
+- Prometheus            :: http://hazelcast-challenge-alb-1707379743.eu-central-1.elb.amazonaws.com/prometheus
+- Alertmanager          :: http://hazelcast-challenge-alb-1707379743.eu-central-1.elb.amazonaws.com/prometheus
+
+EKS:
+- ID                    :: hazelcast-challenge
+- Cluster Version       :: 1.14
+- Cluster Endpoint      :: https://E65886AD525EE6D71CAE514238EBA049.gr7.eu-central-1.eks.amazonaws.com
+
+Management:
+- Node Status           :: kubectl --kubeconfig kubeconfig* get nodes
+- Pods Status           :: kubectl --kubeconfig kubeconfig* get pods --all-namespaces
+```
+
+Apply hotfix for kube-proxy
+```
+kubectl --kubeconfig kubeconfig* -n kube-system get cm kube-proxy-config -o yaml |sed 's/metricsBindAddress: 127.0.0.1:10249/metricsBindAddress: 0.0.0.0:10249/' | kubectl --kubeconfig kubeconfig* apply -f -
+kubectl --kubeconfig kubeconfig* -n kube-system patch ds kube-proxy -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"updateTime\":\"`date +'%s'`\"}}}}}"
+```
+
+Decommission environment
+```
+terraform destroy
+```
+> Double check if this is what you want and if yes confirm action
+
+
 ## Known Issues (not implemented tasks)
 
 - Kube-proxy require extra hotfix (https://github.com/aws/containers-roadmap/issues/657)
