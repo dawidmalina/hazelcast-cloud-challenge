@@ -2,6 +2,11 @@ terraform {
   required_version = ">= 0.12.0"
 }
 
+provider "aws" {
+  version = "~> 2.43"
+  region  = var.AWS_REGION
+}
+
 provider "local" {
   version = "~> 1.2"
 }
@@ -16,7 +21,7 @@ provider "template" {
 
 provider "kubernetes" {
   version     = "~> 1.10"
-  config_path = var.KUBECONFIG_PATH
+  config_path = var.KUBECONFIG_PATH != null ? var.KUBECONFIG_PATH : module.eks.kubeconfig_filename
 }
 
 provider "helm" {
@@ -27,6 +32,6 @@ provider "helm" {
   override        = ["'spec.template.spec.containers[0].command'='{/bin/tiller,--storage=secret,--listen=localhost:44134}'"]
 
   kubernetes {
-    config_path = var.KUBECONFIG_PATH
+    config_path = var.KUBECONFIG_PATH != null ? var.KUBECONFIG_PATH : module.eks.kubeconfig_filename
   }
 }

@@ -64,13 +64,13 @@ resource "helm_release" "prometheus_operator" {
 
   set {
     name  = "alertmanager.alertmanagerSpec.externalUrl"
-    value = "${var.MONITORING_INGRESS_DOMAIN}/alertmanager"
+    value = "http://${module.alb.this_lb_dns_name}/alertmanager"
   }
 
   set {
     name  = "prometheus.prometheusSpec.externalUrl"
-    value = "${var.MONITORING_INGRESS_DOMAIN}/prometheus"
+    value = "http://${module.alb.this_lb_dns_name}/prometheus"
   }
 
-  depends_on = [kubernetes_cluster_role_binding.tiller, kubernetes_secret.monitoring_basic_auth]
+  depends_on = [kubernetes_cluster_role_binding.tiller]
 }

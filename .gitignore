@@ -1,3 +1,7 @@
 /.terraform/
 /.idea/
 **/.terraform/
+**/kubeconfig*
+**/config-map-aws-auth*
+**/terraform.tfstate*
+/terraform/.terraform*

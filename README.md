@@ -6,7 +6,8 @@ Procedure requires several components which must be installed (available) on you
 
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [terraform](https://www.terraform.io/downloads.html)
-- [helm](https://helm.sh/docs/intro/install/)
+- [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)
+- [aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
 > Installation of those components is out of scope of this document so please proceed with official documentation where all required steps are precisely described
 

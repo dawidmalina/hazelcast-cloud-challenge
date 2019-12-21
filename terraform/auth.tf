@@ -8,4 +8,5 @@ resource "kubernetes_secret" "monitoring_basic_auth" {
     auth = var.MONITORING_BASIC_AUTH
   }
 
+  depends_on = [helm_release.prometheus_operator]
 }
