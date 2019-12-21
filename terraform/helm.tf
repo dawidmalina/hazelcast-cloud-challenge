@@ -62,5 +62,15 @@ resource "helm_release" "prometheus_operator" {
     file("addons/prometheus-operator.yaml")
   ]
 
-  depends_on = [kubernetes_cluster_role_binding.tiller]
+  set {
+    name  = "alertmanager.alertmanagerSpec.externalUrl"
+    value = "${var.MONITORING_INGRESS_DOMAIN}/alertmanager"
+  }
+
+  set {
+    name  = "prometheus.prometheusSpec.externalUrl"
+    value = "${var.MONITORING_INGRESS_DOMAIN}/prometheus"
+  }
+
+  depends_on = [kubernetes_cluster_role_binding.tiller, kubernetes_secret.monitoring_basic_auth]
 }

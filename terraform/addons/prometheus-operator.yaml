@@ -13,8 +13,23 @@ additionalPrometheusRulesMap:
             annotations:
               summary: "High memory usage for :: {{ $labels.pod }}"
               description: "Pod memory usage is above 10%\n  Pod: {{ $labels.pod }}\n  Namespace: {{ $labels.namespace }}\n  Usage = {{ $value }}\n"
+
 # configure alertmanager
 alertmanager:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Alertmanager'
+    paths:
+      - /alertmanager
+  alertmanagerSpec:
+    routePrefix : alertmanager/
+  # configure notifications
   config:
     global:
       resolve_timeout: 5m
@@ -37,15 +52,34 @@ alertmanager:
         webhook_configs:
           - url: 'https://hazelcast-cloud-challenge.herokuapp.com/challenge_events'
             send_resolved: true
+
+# configure grafana
 grafana:
   # test only - not needed
   enabled: False
+
+# configure prometheus
+prometheus:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - Prometheus'
+    paths:
+      - /prometheus
+  prometheusSpec:
+    routePrefix : prometheus/
+
+# not needed in EKS
 kubeEtcd:
-  # not needed in EKS
   enabled: False
+# not needed in EKS
 kubeControllerManager:
-  # not needed in EKS
   enabled: False
+# not needed in EKS
 kubeScheduler:
-  # not needed in EKS
   enabled: False
